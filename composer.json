@@ -1,6 +1,6 @@
 {
-  "name": "innocode-digital/wp-mail-helper",
-  "version": "0.1.0",
+  "name": "innocode-digital/wp-mail-helpers",
+  "version": "1.0.0",
   "type": "wordpress-muplugin",
   "license": "GPL-2.0+",
   "require": {

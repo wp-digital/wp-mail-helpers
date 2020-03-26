@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Mail Helpers
  * Description: Overrides mail From headers, adds check of mail functionality.
- * Version: 0.1.0
+ * Version: 1.0.0
  * Author: Innocode
  * Author URI: https://innocode.com
  * Tested up to: 5.3.2
@@ -18,3 +18,16 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 
 $innocode_mail_helpers = new Helpers\Plugin( __DIR__ );
 $innocode_mail_helpers->run();
+
+$GLOBALS['innocode_mail_helpers'] = $innocode_mail_helpers;
+
+if ( ! function_exists( 'innocode_mail_helpers' ) ) {
+    function innocode_mail_helpers() {
+        /**
+         * @var Helpers\Plugin $innocode_mail_helpers
+         */
+        global $innocode_mail_helpers;
+
+        return $innocode_mail_helpers;
+    }
+}
