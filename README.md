@@ -57,7 +57,7 @@ if ( function_exists( 'innocode_mail_helpers' ) ) {
 
 There is a possibility to set **From** mail headers in WordPress administration panel:
 **Settings** > **Mail**. **From Email** should be verified in a similar way like WordPress
-verifies **Administration Email Address**. These settings have bigger priority than constant.
+verifies **Administration Email Address**. These settings have bigger priority than constants.
 
 #### Tools
 
