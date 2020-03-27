@@ -192,6 +192,14 @@ final class Plugin
      */
     public function pre_update_new_from_address( $value, $old_value )
     {
+        $from_address = $this->option( 'from_address' );
+
+        if ( ! $value && $from_address->get() ) {
+            $from_address->delete();
+
+            return $value;
+        }
+
         if ( ! $value && $old_value ) {
             return $old_value;
         }
@@ -206,6 +214,7 @@ final class Plugin
     public function update_new_from_address( $old_value, $value )
     {
         if (
+            ! $value ||
             ! is_email( $value ) ||
             $value == $this->option( 'from_address' )->get()
         ) {
