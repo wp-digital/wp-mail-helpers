@@ -34,6 +34,7 @@ final class Plugin
             [ $this, 'option' ],
             [ $this, 'view' ]
         );
+        $this->_options['from_address'] = new Option( 'from_address' );
         $this->_options['hash'] = new Option( 'hash' );
 
         foreach ( array_keys( $admin->get_settings() ) as $name ) {

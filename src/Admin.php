@@ -12,9 +12,6 @@ final class Admin
      * @var array
      */
     private $_settings = [
-        'from_address'          => [
-            'sanitize_callback' => 'sanitize_email',
-        ],
         'new_from_address'      => [
             'sanitize_callback' => 'sanitize_email',
         ],
