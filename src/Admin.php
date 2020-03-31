@@ -62,7 +62,10 @@ final class Admin
             'callback' => function () {
                 printf(
                     '<p>%s</p>',
-                    __( 'Send a test email to selected address and check mail functionality, headers etc.', 'innocode-mail-helpers' )
+                    __(
+                        'Send a test email to selected address and check mail functionality, headers etc.',
+                        'innocode-mail-helpers'
+                    )
                 );
             },
             'page'     => Plugin::OPTION_GROUP . '_tools',
@@ -86,8 +89,25 @@ final class Admin
                     esc_attr( $new_from_address->get_name() ),
                     esc_attr( $value ),
                     esc_attr( $from_address->get_default() ),
-                    __( 'The email address which emails are sent from.', 'innocode-mail-helpers' )
+                    __(
+                        'The email address which emails are sent from. <strong>It\'s recommended that the domain portion matches your sending domain.</strong>',
+                        'innocode-mail-helpers'
+                    )
                 );
+
+                if ( defined( 'MAILGUN_DOMAIN' ) ) {
+                    printf(
+                        '<p class="description">%s</p>',
+                        sprintf(
+                            __(
+                                'Most likely %s is used as mailer and <strong>%s</strong> is your sending domain.',
+                                'innocode-mail-helpers'
+                            ),
+                            '<a href="https://www.mailgun.com/" target="_blank" rel="noreferrer noopener">Mailgun</a>',
+                            MAILGUN_DOMAIN
+                        )
+                    );
+                }
 
                 $new_value = $new_from_address->get();
 
@@ -274,6 +294,40 @@ final class Admin
                 '<h1>' . __( 'You need a higher level of permission.' ) . '</h1>' .
                 '<p>' . __( 'Sorry, you are not allowed to manage options for this site.' ) . '</p>',
                 403
+            );
+        }
+    }
+
+    /**
+     * @param Option $from_address
+     * @param Option $new_from_address
+     */
+    public function check_from_email_domain( Option $from_address, Option $new_from_address )
+    {
+        if ( ! defined( 'MAILGUN_DOMAIN' ) ) {
+            return;
+        }
+
+        $from_address_value = $from_address->get();
+
+        if ( ! $from_address_value || ! is_email( $from_address_value ) ) {
+            return;
+        }
+
+        list( , $domain ) = explode( '@', $from_address_value, 2 );
+
+        if ( $domain != MAILGUN_DOMAIN ) {
+            add_settings_error(
+                $new_from_address->get_name(),
+                'from_email_domain_different_with_sender',
+                sprintf(
+                    __(
+                        'The currently set From Email address has different domain with the most likely used sending domain: %s.',
+                        'innocode-mail-helpers'
+                    ),
+                    MAILGUN_DOMAIN
+                ),
+                'warning'
             );
         }
     }

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Mail Helpers
  * Description: Overrides mail From headers, adds check of mail functionality.
- * Version: 1.0.3
+ * Version: 1.1.0
  * Author: Innocode
  * Author URI: https://innocode.com
  * Tested up to: 5.3.2

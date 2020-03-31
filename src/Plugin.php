@@ -69,7 +69,7 @@ final class Plugin
         add_filter(
             "pre_update_option_{$new_from_address->get_name()}",
             [ $this, 'pre_update_new_from_address' ],
-            10, 2
+            10, 3
         );
 
         add_action(
@@ -175,6 +175,8 @@ final class Plugin
                     $admin->dismiss_new_from_address_action( $new_from_address, $hash );
                 }
 
+                $admin->check_from_email_domain( $from_address, $new_from_address );
+
                 break;
             case 'tools_page_' . static::OPTION_GROUP . '_tools':
                 if ( isset( $_POST['action'] ) && $_POST['action'] == 'test' ) {
@@ -188,10 +190,27 @@ final class Plugin
     /**
      * @param $value
      * @param $old_value
+     * @param $option
      * @return mixed
      */
-    public function pre_update_new_from_address( $value, $old_value )
+    public function pre_update_new_from_address( $value, $old_value, $option )
     {
+        if (
+            $value &&
+            function_exists( 'innocode_mailgun_email_validation' ) &&
+            ! innocode_mailgun_email_validation()->is_valid( $value )
+        ) {
+            if ( function_exists( 'add_settings_error' ) ) {
+                add_settings_error(
+                    $this->option( $option ),
+                    "invalid_{$option}",
+                    __( 'The From Email address entered did not appear to be a valid email address. Please enter a valid email address.', 'innocode-mail-helpers' )
+                );
+            }
+
+            return $old_value;
+        }
+
         $from_address = $this->option( 'from_address' );
 
         if ( ! $value && $from_address->get() ) {
