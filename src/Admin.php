@@ -316,7 +316,7 @@ final class Admin
 
         list( , $domain ) = explode( '@', $from_address_value, 2 );
 
-        if ( $domain != MAILGUN_DOMAIN ) {
+        if ( substr( MAILGUN_DOMAIN, -strlen( $domain ) ) === $domain ) {
             add_settings_error(
                 $new_from_address->get_name(),
                 'from_email_domain_different_with_sender',
