@@ -51,18 +51,22 @@ final class Plugin
     {
         $admin = $this->get_admin();
 
-        add_action( 'admin_init', [ $admin, 'register_settings' ] );
+        if ( is_multisite() ) {
+            add_action( 'admin_init', [ $admin, 'register_settings' ] );
+        }
+
         add_action( 'admin_menu', [ $admin, 'add_pages' ] );
         add_action( 'admin_init', [ $admin, 'add_sections' ] );
         add_action( 'admin_init', [ $admin, 'add_fields' ] );
-        add_action(
-            'load-settings_page_' . static::OPTION_GROUP,
-            [ $this, 'handle_action' ]
-        );
-        add_action(
-            'load-tools_page_' . static::OPTION_GROUP . '_tools',
-            [ $this, 'handle_action' ]
-        );
+
+        foreach ( $admin->get_pages() as $name => $page ) {
+            $type = $name == 'management' ? 'tools' : 'settings';
+
+            add_action(
+                "load-{$type}_page_{$page['menu_slug']}",
+                [ $this, 'handle_action' ]
+            );
+        }
 
         $new_from_address = $this->option( 'new_from_address' );
 

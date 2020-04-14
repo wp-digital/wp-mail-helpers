@@ -11,7 +11,7 @@ final class Admin
     /**
      * @var array
      */
-    private $_settings = [
+    private $settings = [
         'new_from_address'      => [
             'sanitize_callback' => 'sanitize_email',
         ],
@@ -22,15 +22,15 @@ final class Admin
     /**
      * @var array
      */
-    private $_pages = [];
+    private $pages = [];
     /**
      * @var array
      */
-    private $_sections = [];
+    private $sections = [];
     /**
      * @var array
      */
-    private $_fields = [];
+    private $fields = [];
 
     /**
      * Admin constructor.
@@ -39,15 +39,38 @@ final class Admin
      */
     public function __construct( callable $option, callable $view )
     {
-        foreach ( [ 'management', 'options' ] as $page ) {
-            $this->_pages[ $page ] = [
-                'callback' => function () use ( $view, $page ) {
-                    $view( "$page-page" );
-                },
-            ];
-        }
+        $this->init_page( $view, 'management' );
+        $this->init_test_section();
+        $this->init_test_email_to_field();
 
-        $this->_sections['headers'] = [
+        // Use constants on single sites
+        if ( is_multisite() ) {
+            $this->init_page( $view, 'options' );
+            $this->init_headers_section();
+            $this->init_new_from_address_field( $option );
+            $this->init_from_name_field( $option );
+        }
+    }
+
+    /**
+     * @param callable $view
+     * @param string $name
+     */
+    private function init_page( callable $view, $name )
+    {
+        $this->pages[ $name ] = [
+            'menu_slug' => Plugin::OPTION_GROUP . (
+                $name == 'management' ? '_tools' : ''
+            ),
+            'callback'  => function () use ( $view, $name ) {
+                $view( "$name-page" );
+            },
+        ];
+    }
+    
+    private function init_headers_section()
+    {
+        $this->sections['headers'] = [
             'title'    => __( 'Headers', 'innocode-mail-helpers' ),
             'callback' => function () {
                 printf(
@@ -57,7 +80,11 @@ final class Admin
             },
             'page'     => Plugin::OPTION_GROUP,
         ];
-        $this->_sections['test'] = [
+    }
+
+    private function init_test_section()
+    {
+        $this->sections['test'] = [
             'title'    => __( 'Test Email', 'innocode-mail-helpers' ),
             'callback' => function () {
                 printf(
@@ -70,8 +97,14 @@ final class Admin
             },
             'page'     => Plugin::OPTION_GROUP . '_tools',
         ];
+    }
 
-        $this->_fields['new_from_address'] = [
+    /**
+     * @param callable $option
+     */
+    private function init_new_from_address_field( callable $option )
+    {
+        $this->fields['new_from_address'] = [
             'title'    => __( 'From Email', 'innocode-mail-helpers' ),
             'callback' => function () use ( $option ) {
                 /**
@@ -133,7 +166,14 @@ final class Admin
             'page'     => Plugin::OPTION_GROUP,
             'section'  => 'headers',
         ];
-        $this->_fields['from_name'] = [
+    }
+
+    /**
+     * @param callable $option
+     */
+    private function init_from_name_field( callable $option )
+    {
+        $this->fields['from_name'] = [
             'title'    => __( 'From Name', 'innocode-mail-helpers' ),
             'callback' => function () use ( $option ) {
                 /**
@@ -154,7 +194,11 @@ final class Admin
             'page'     => Plugin::OPTION_GROUP,
             'section'  => 'headers',
         ];
-        $this->_fields['test_email_to'] = [
+    }
+    
+    private function init_test_email_to_field()
+    {
+        $this->fields['test_email_to'] = [
             'title'    => __( 'Email Address', 'innocode-mail-helpers' ),
             'callback' => function () {
                 $user_email = wp_get_current_user()->user_email;
@@ -179,7 +223,7 @@ final class Admin
      */
     public function get_settings()
     {
-        return $this->_settings;
+        return $this->settings;
     }
 
     /**
@@ -187,7 +231,7 @@ final class Admin
      */
     public function get_pages()
     {
-        return $this->_pages;
+        return $this->pages;
     }
 
     /**
@@ -195,7 +239,7 @@ final class Admin
      */
     public function get_sections()
     {
-        return $this->_sections;
+        return $this->sections;
     }
 
     /**
@@ -203,7 +247,7 @@ final class Admin
      */
     public function get_fields()
     {
-        return $this->_fields;
+        return $this->fields;
     }
 
     /**
@@ -251,9 +295,7 @@ final class Admin
                 __( 'Mail', 'innocode-mail-helpers' ),
                 __( 'Mail', 'innocode-mail-helpers' ),
                 'manage_options',
-                Plugin::OPTION_GROUP . (
-                    $name == 'management' ? '_tools' : ''
-                ),
+                $page['menu_slug'],
                 $page['callback']
             );
         }
