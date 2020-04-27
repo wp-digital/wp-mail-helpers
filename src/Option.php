@@ -11,7 +11,7 @@ class Option
     /**
      * @var string
      */
-    protected $_name;
+    protected $name;
 
     /**
      * Option constructor.
@@ -19,7 +19,7 @@ class Option
      */
     public function __construct( $name )
     {
-        $this->_name = $name;
+        $this->name = $name;
     }
 
     /**
@@ -27,7 +27,7 @@ class Option
      */
     public function get_name()
     {
-        return Plugin::OPTION_GROUP . "_$this->_name";
+        return Plugin::OPTION_GROUP . "_$this->name";
     }
 
     /**
@@ -35,7 +35,7 @@ class Option
      */
     public function get_default()
     {
-        $constant = 'MAIL_' . strtoupper( $this->_name );
+        $constant = 'MAIL_' . strtoupper( $this->name );
 
         return defined( $constant ) ? constant( $constant ) : false;
     }

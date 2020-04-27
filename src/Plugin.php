@@ -13,15 +13,15 @@ final class Plugin
     /**
      * @var string
      */
-    private $_path;
+    private $path;
     /**
      * @var array
      */
-    private $_options = [];
+    private $options = [];
     /**
      * @var Admin
      */
-    private $_admin;
+    private $admin;
 
     /**
      * Plugin constructor.
@@ -29,19 +29,19 @@ final class Plugin
      */
     public function __construct( $path )
     {
-        $this->_path = $path;
+        $this->path = $path;
         $admin = new Admin(
             [ $this, 'option' ],
             [ $this, 'view' ]
         );
-        $this->_options['from_address'] = new Option( 'from_address' );
-        $this->_options['hash'] = new Option( 'hash' );
+        $this->options['from_address'] = new Option( 'from_address' );
+        $this->options['hash'] = new Option( 'hash' );
 
         foreach ( array_keys( $admin->get_settings() ) as $name ) {
-            $this->_options[ $name ] = new Option( $name );
+            $this->options[ $name ] = new Option( $name );
         }
 
-        $this->_admin = $admin;
+        $this->admin = $admin;
     }
 
     /**
@@ -96,7 +96,7 @@ final class Plugin
      */
     public function get_path()
     {
-        return $this->_path;
+        return $this->path;
     }
 
     /**
@@ -131,7 +131,7 @@ final class Plugin
      */
     public function get_options()
     {
-        return $this->_options;
+        return $this->options;
     }
 
     /**
@@ -150,7 +150,7 @@ final class Plugin
      */
     public function get_admin()
     {
-        return $this->_admin;
+        return $this->admin;
     }
 
     public function handle_action()
